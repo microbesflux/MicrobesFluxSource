@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from constants import user_filebase
+import uuid
 
 """ This Profile model describes a user's optimization problem
 and pathway target.
@@ -26,12 +27,17 @@ class Compound(models.Model):
 class Task(models.Model):
     task_id   =  models.AutoField(primary_key = True)
     task_type =  models.CharField(max_length = 10)
-    main_file =  models.CharField(max_length = 50)
+    main_file =  models.CharField(max_length = 50) 
     additional_file =  models.CharField(max_length = 50)
     email     = models.EmailField(max_length = 75)
     status    = models.CharField(max_length = 10)
+	uuid      = models.CharField(max_length = 50, primary_key = True, default = make_uuid, editable = False)
+    	
+
+	def make_uuid(self):
+	    return str(uuid.uuid4().int>>64)
     def __unicode__(self):
-        return str(self.task_id) + "," + self.main_file + "," + self.task_type + "," + self.email + "," + self.status + "," + self.additional_file
+        return str(self.uuid) + "," + str(self.task_id) + "," + self.main_file + "," + self.task_type + "," + self.email + "," + self.status + "," + self.additional_file
 
 # User can save/load their models. We put the serialized PathwayNetwork
 # object in "Collection".

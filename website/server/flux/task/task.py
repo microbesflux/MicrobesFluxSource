@@ -91,10 +91,11 @@ def task_list(request):
         l.append(str(t))
     return HttpResponse(content = '\n'.join(l), status = 200, content_type = "text/html")
 
+
 def task_remove(request):
-    tid = request.GET['tid']
+    t_uuid = request.GET['uuid']
     try:
-        to_remove = Task.objects.get(task_id = tid)
+        to_remove = Task.objects.get(uuid = t_uuid)
         to_remove.delete()
         return HttpResponse(content = "Task Removed", status = 200, content_type = "text/html")
     except Task.DoesNotExist:
@@ -107,14 +108,14 @@ def task_add(request):
     t_addif = ""
     if request.GET.has_key('file'):
         t_addif = request.GET['file']
-    t = Task(task_type = t_type, main_file = t_file, email = t_email, additional_file = t_addif, status = "TODO")
+    t = Task(uuid = make_uuid, task_type = t_type, main_file = t_file, email = t_email, additional_file = t_addif, status = "TODO")
     t.save()
     return HttpResponse(content = """ Task added  """, status = 200, content_type = "text/html")
 
 def task_unmark(request):
-    tid = request.GET['tid']
+    t_uuid = request.GET['uuid']
     try:
-        to_mark = Task.objects.get(task_id = tid)
+        to_mark = Task.objects.get(uuid = t_uuid)
         to_mark.status = "TODO"
         to_mark.save()
         return HttpResponse(content = "Task Un-marked", status = 200, content_type = "text/html")
@@ -122,9 +123,9 @@ def task_unmark(request):
         return HttpResponse(content = "No such task", status = 200, content_type = "text/html")
 
 def task_mark(request):
-    tid = request.GET['tid']
+    t_uuid = request.GET['uuid']
     try:
-        to_mark = Task.objects.get(task_id = tid)
+        to_mark = Task.objects.get(uuid = t_uuid)
         to_mark.status = "Enqueue"
         # TODO: send out a piece of email, saying it is enqueued
         to_mark.save()
@@ -133,9 +134,9 @@ def task_mark(request):
         return HttpResponse(content = "No such task", status = 200, content_type = "text/html")
 
 def task_mail(request):
-    tid = request.GET['tid']
+    t_uuid = request.GET['uuid']
     try:
-        to_mail = Task.objects.get(task_id = tid)
+        to_mail = Task.objects.get(uuid = t_uuid)
         newf = to_mail.main_file.split(".")[0]  # take the base name
         address = to_mail.email
         if to_mail.task_type == "fba":
